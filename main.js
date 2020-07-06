@@ -54,6 +54,9 @@ module.exports.loop = function () {
         console.log('Room "'+name+'" has '+Game.rooms[name].energyAvailable+' energy');
     }
 
+    /** Probably loop through all spawners or rooms and go from there  */
+    console.log('ROOM *****: ' + Game.spawns.Spawn1.room.energyAvailable)
+
     /** Role assignment & run*/
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
