@@ -49,6 +49,11 @@ module.exports.loop = function () {
             {align: 'left', opacity: 0.8});
     }
 
+    /** Energy notification */
+    for(var name in Game.rooms) {
+        console.log('Room "'+name+'" has '+Game.rooms[name].energyAvailable+' energy');
+    }
+
     /** Role assignment & run*/
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
