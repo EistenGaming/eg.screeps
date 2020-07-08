@@ -4,6 +4,8 @@ var roleBuilder = require('role.builder');
 var utilRoom = require('util.room');
 var spawnTickDelay = 50
 var structureCheckTickDelay = 50
+var infoTickDelay = 20
+var infoTimestamp = 0
 var spawnTimestamp = 0
 var structureTimestamp = 0
 var targetExtensionCount = 5
@@ -26,7 +28,6 @@ module.exports.loop = function () {
 
         for(var name in Game.rooms) {
             var currentEnergy = utilRoom.getEnergy(name)
-            console.log('• Room "' + name + '" has ' + currentEnergy + ' energy available.');    
 
             /** Autospawner */
             var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
@@ -91,6 +92,20 @@ module.exports.loop = function () {
         console.log('-------------------------------------------------')
         structureTimestamp = Game.time
     }
+
+    /** Game info */
+    if (Game.time > infoTimestamp + infoTickDelay) {
+
+        for(var roomName in Game.rooms) {
+            console.log(' ')
+            console.log('GAME INFO ['+roomName+']')
+            var currentEnergy = utilRoom.getEnergy(roomName)
+            console.log('• Room "' + roomName + '" has ' + currentEnergy + ' energy available.');    
+            console.log('-------------------------------------------------')
+            infoTimestamp = Game.time
+        }
+    }
+
 
 
     /** Role assignment & run*/
