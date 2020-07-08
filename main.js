@@ -70,19 +70,16 @@ module.exports.loop = function () {
     }
 
     /** Structure building Logic */
-    var extensions = _.filter(Game.structures, (structure) => structure.structureType == 'extension'); /** TODO: Check if this is per room? */
     if (Game.time > structureTimestamp + structureCheckTickDelay) {
         console.log('-[ Tick: Structure ]-')
 
         for(var roomName in Game.rooms) {
 
             var validTiles = utilRoom.getValidTiles(roomName)
-            
+            var extensions = _.filter(Game.structures, (structure) => structure.structureType == 'extension'); /** TODO: Check if this is per room? Attention: Construction sites of type 'extension' != extensions!*/
             if (extensions.length < targetExtensionCount) {
-                console.log('[' + roomName + '] does not have enough extensions. Lets build some.')
+                console.log('[' + roomName + '] Building extension: '+extensions.length+' of ['+targetExtensionCount+']')
                 for (let index = 0; index < targetExtensionCount; index++) {
-                    console.log('Tile: ' + validTiles[index])
-                    console.log('Number of valid Tiles: ' + validTiles.length)
                     Game.rooms[roomName].createConstructionSite(validTiles[index][0], validTiles[index][1], 'extension', 'Ext' + index)    
                 }
                 
