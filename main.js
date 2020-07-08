@@ -1,6 +1,12 @@
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
+var utilRoom = require('util.room');
+var spawnTickDelay = 50
+var structureCheckTickDelay = 50
+var spawnTimestamp = 0
+var structureTimestamp = 0
+var targetExtensionCount = 5
 
 module.exports.loop = function () {
 
@@ -12,50 +18,79 @@ module.exports.loop = function () {
         }
     }
 
-    /** Autospawner */
-    var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
-    var upgraders  = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
-    var builders  = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
-    console.log('Harvesters: ' + harvesters.length + ' | Upgraders: ' + upgraders.length+ ' | Builders: ' + builders.length);
+    /** Spawning logic, per room */
+    /** The spawning logic is delayed by spawnTickDelay */
+    if (Game.time > spawnTimestamp + spawnTickDelay) {
+        console.log('-[ Tick: Spawner ]-')
 
-    if(harvesters.length < 2) {
-        var newName = 'Harvester' + Game.time;
-        console.log('Spawning new harvester: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
-            {memory: {role: 'harvester'}});
+        for(var name in Game.rooms) {
+            var currentEnergy = utilRoom.getEnergy(name)
+            console.log('Room "' + name + '" has ' + currentEnergy + ' energy available.');    
+
+            /** Autospawner */
+            var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
+            var upgraders  = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
+            var builders  = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
+        
+            if(harvesters.length < 2 && currentEnergy >= 200) {
+                var newName = 'Harvester' + Game.time;
+                console.log('Spawning new harvester: ' + newName);
+                Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
+                    {memory: {role: 'harvester'}});
+            }
+        
+            if(upgraders.length < 2 && currentEnergy >= 200) {
+                var newName = 'Upgrader' + Game.time;
+                console.log('Spawning new upgrader: ' + newName);
+                Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
+                    {memory: {role: 'upgrader'}});
+            }
+        
+            if(builders.length < 5 && currentEnergy >= 200) {
+                var newName = 'Builder' + Game.time;
+                console.log('Spawning new builder: ' + newName);
+                Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
+                    {memory: {role: 'builder'}});
+            }
+
+        }
+
+            /** Spawning notifications */
+        if(Game.spawns['Spawn1'].spawning) { 
+            var spawningCreep = Game.creeps[Game.spawns['Spawn1'].spawning.name];
+            Game.spawns['Spawn1'].room.visual.text(
+                '🛠️' + spawningCreep.memory.role,
+                Game.spawns['Spawn1'].pos.x + 1, 
+                Game.spawns['Spawn1'].pos.y, 
+                {align: 'left', opacity: 0.8});
+        }
+
+        console.log('Harvesters: ' + harvesters.length + ' | Upgraders: ' + upgraders.length+ ' | Builders: ' + builders.length);
+        spawnTimestamp = Game.time
     }
 
-    if(upgraders.length < 2) {
-        var newName = 'Upgrader' + Game.time;
-        console.log('Spawning new upgrader: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
-            {memory: {role: 'upgrader'}});
+    /** Structure building Logic */
+    var extensions = _.filter(Game.structures, (structure) => structure.structureType == 'extension'); /** TODO: Check if this is per room? */
+    if (Game.time > structureTimestamp + structureCheckTickDelay) {
+        console.log('-[ Tick: Structure ]-')
+
+        for(var roomName in Game.rooms) {
+
+            var validTiles = utilRoom.getValidTiles(roomName)
+            
+            if (extensions.length < targetExtensionCount) {
+                console.log('[' + roomName + '] does not have enough extensions. Lets build some.')
+                for (let index = 0; index < targetExtensionCount; index++) {
+                    console.log('Tile: ' + validTiles[index])
+                    console.log('Number of valid Tiles: ' + validTiles.length)
+                    Game.rooms[roomName].createConstructionSite(validTiles[index][0], validTiles[index][1], 'extension', 'Ext' + index)    
+                }
+                
+            }
+        }
+        structureTimestamp = Game.time
     }
 
-    if(builders.length < 5 ) {
-        var newName = 'Builder' + Game.time;
-        console.log('Spawning new builder: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
-            {memory: {role: 'builder'}});
-    }
-    
-    /** Spawning notifications */
-    if(Game.spawns['Spawn1'].spawning) { 
-        var spawningCreep = Game.creeps[Game.spawns['Spawn1'].spawning.name];
-        Game.spawns['Spawn1'].room.visual.text(
-            '🛠️' + spawningCreep.memory.role,
-            Game.spawns['Spawn1'].pos.x + 1, 
-            Game.spawns['Spawn1'].pos.y, 
-            {align: 'left', opacity: 0.8});
-    }
-
-    /** Energy notification */
-    for(var name in Game.rooms) {
-        console.log('Room "'+name+'" has '+Game.rooms[name].energyAvailable+' energy');
-    }
-
-    /** Probably loop through all spawners or rooms and go from there  */
-    console.log('ROOM *****: ' + Game.spawns.Spawn1.room.energyAvailable)
 
     /** Role assignment & run*/
     for(var name in Game.creeps) {
@@ -70,5 +105,4 @@ module.exports.loop = function () {
             roleBuilder.run(creep);
         }
     }
-
 }
