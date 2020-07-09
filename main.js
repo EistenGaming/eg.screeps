@@ -9,6 +9,7 @@ var infoTimestamp = 0
 var spawnTimestamp = 0
 var structureTimestamp = 0
 var targetExtensionCount = 5
+var spwanToSourceRoads = true
 
 module.exports.loop = function () {
 
@@ -26,29 +27,29 @@ module.exports.loop = function () {
         console.log(' ')
         console.log('TICK: Spawner')
 
-        for(var name in Game.rooms) {
-            var currentEnergy = utilRoom.getEnergy(name)
+        for(var roomName in Game.rooms) {
+            var currentEnergy = utilRoom.getEnergy(roomName)
 
             /** Autospawner */
             var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
             var upgraders  = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
             var builders  = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
         
-            if(harvesters.length < 2 && currentEnergy >= 200) {
+            if(harvesters.length < 4 && currentEnergy >= 200) {
                 var newName = 'Harvester' + Game.time;
                 console.log('• Spawning new harvester: ' + newName);
                 Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
                     {memory: {role: 'harvester'}});
             }
         
-            if(upgraders.length < 2 && currentEnergy >= 200) {
+            if(upgraders.length < 3 && currentEnergy >= 200) {
                 var newName = 'Upgrader' + Game.time;
                 console.log('• Spawning new upgrader: ' + newName);
                 Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
                     {memory: {role: 'upgrader'}});
             }
         
-            if(builders.length < 5 && currentEnergy >= 200) {
+            if(builders.length < 5 && currentEnergy >= 200 && utilRoom.hasConstructionSites(roomName) == true) {
                 var newName = 'Builder' + Game.time;
                 console.log('• Spawning new builder: ' + newName);
                 Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
@@ -77,7 +78,8 @@ module.exports.loop = function () {
         console.log(' ')
         console.log('TICK: Structure')
         for(var roomName in Game.rooms) {
-
+            
+            /** Extensions */
             var validTiles = utilRoom.getValidTiles(roomName)
             var extensions = _.filter(Game.structures, (structure) => structure.structureType == 'extension'); /** TODO: Check if this is per room? Attention: Construction sites of type 'extension' != extensions!*/
             if (extensions.length < targetExtensionCount) {
@@ -86,9 +88,34 @@ module.exports.loop = function () {
                     Game.rooms[roomName].createConstructionSite(validTiles[index][0], validTiles[index][1], 'extension', 'Ext' + index)    
                 }
             } else {
-                console.log('• [' + roomName + '] Nothing to build')
+                console.log('• [' + roomName + '] No extensions to build')
             }
+            
+            /** Roads To Sources */
+            // Determine location of start and target
+            // determine path from start to finish
+            // loop through the path and create a construction site for each step
+            // Create builders
+            if (spwanToSourceRoads == true) {
+                var sources = Game.spawns['Spawn1'].room.find(FIND_SOURCES);
+                var startPos = Game.spawns['Spawn1'].pos
+
+                for (let index = 0; index < sources.length; index++) {
+                    var targetPos = sources[index].pos 
+                    console.log('• [' + roomName + '] Building road from: '+startPos.x+'.'+startPos.y+' to '+targetPos.x+'.'+targetPos.y)
+                    const path = Game.spawns['Spawn1'].room.findPath(startPos, targetPos)
+                    for (let index = 0; index < path.length; index++) {
+                        const element = path[index];
+                        Game.rooms[roomName].createConstructionSite(element.x, element.y, 'road', 'Rd' + index)
+                    }                    
+                }
+                spwanToSourceRoads = false
+            }
+
         }
+
+        /** if there are construction sites in the room, create builders. Dont if there aren't any */
+
         console.log('-------------------------------------------------')
         structureTimestamp = Game.time
     }
@@ -100,7 +127,8 @@ module.exports.loop = function () {
             console.log(' ')
             console.log('GAME INFO ['+roomName+']')
             var currentEnergy = utilRoom.getEnergy(roomName)
-            console.log('• Room "' + roomName + '" has ' + currentEnergy + ' energy available.');    
+            console.log('• Room ' + roomName + ' has ' + currentEnergy + ' energy available.');
+            console.log('• Room ' + roomName + ' Construction work to do: ' + utilRoom.hasConstructionSites(roomName))
             console.log('-------------------------------------------------')
             infoTimestamp = Game.time
         }

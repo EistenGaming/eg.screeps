@@ -22,6 +22,18 @@ var utilRoom = {
             }
         }
         return validTiles
+    },
+
+    /** @param {string} roomName */
+    hasConstructionSites: function(roomName) {
+        val = false
+        var constructionSites = Game.rooms[roomName].find(FIND_MY_CONSTRUCTION_SITES)
+        if (constructionSites.length > 0) {
+            val = true
+        } else {
+            val = false
+        }
+        return val
     }
 };
 
