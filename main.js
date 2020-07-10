@@ -9,7 +9,7 @@ var infoTickDelay = 20
 var infoTimestamp = 0
 var spawnTimestamp = 0
 var structureTimestamp = 0
-var targetExtensionCount = 5
+var targetExtensionCount = 0
 var spawnToSourceRoads = true
 var spawnToExtensionRoads = true
 var spawnToControlRoads = true
@@ -84,6 +84,34 @@ module.exports.loop = function () {
         for(var roomName in Game.rooms) {
             
             /** Extensions */
+            /** Set targetExtensionCount based on controller level */
+            var controllerLevel = Game.spawns['Spawn1'].room.controller.level
+            switch (controllerLevel) {
+                case 2:
+                    targetExtensionCount = 5
+                    break;
+                case 3:
+                    targetExtensionCount = 10
+                    break;
+                case 4:
+                    targetExtensionCount = 20
+                    break;
+                case 5:
+                    targetExtensionCount = 30
+                    break;
+                case 6:
+                    targetExtensionCount = 40
+                    break;
+                case 7:
+                    targetExtensionCount = 50
+                    break;
+                case 8:
+                    targetExtensionCount = 60
+                    break;
+                default:
+                    break;
+            }
+
             var validTiles = utilRoom.getValidTiles(roomName)
             var extensions = _.filter(Game.structures, (structure) => structure.structureType == 'extension'); /** TODO: Check if this is per room? Attention: Construction sites of type 'extension' != extensions!*/
             if (extensions.length < targetExtensionCount) {
