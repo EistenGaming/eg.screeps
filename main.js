@@ -2,6 +2,7 @@ var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 var utilRoom = require('util.room');
+var util = require('util');
 var spawnTickDelay = 50
 var structureCheckTickDelay = 50
 var infoTickDelay = 20
@@ -9,7 +10,10 @@ var infoTimestamp = 0
 var spawnTimestamp = 0
 var structureTimestamp = 0
 var targetExtensionCount = 5
-var spwanToSourceRoads = true
+var spawnToSourceRoads = true
+var spawnToExtensionRoads = true
+var spawnToControlRoads = true
+var sourcesToControl = true
 
 module.exports.loop = function () {
 
@@ -91,12 +95,8 @@ module.exports.loop = function () {
                 console.log('• [' + roomName + '] No extensions to build')
             }
             
-            /** Roads To Sources */
-            // Determine location of start and target
-            // determine path from start to finish
-            // loop through the path and create a construction site for each step
-            // Create builders
-            if (spwanToSourceRoads == true) {
+            /** Roads: Spawn->Sources */
+            if (spawnToSourceRoads == true) {
                 var sources = Game.spawns['Spawn1'].room.find(FIND_SOURCES);
                 var startPos = Game.spawns['Spawn1'].pos
 
@@ -109,7 +109,41 @@ module.exports.loop = function () {
                         Game.rooms[roomName].createConstructionSite(element.x, element.y, 'road', 'Rd' + index)
                     }                    
                 }
-                spwanToSourceRoads = false
+                spawnToSourceRoads = false
+            }
+
+            /** Roads: Spawn->Extensions */
+            if (spawnToExtensionRoads == true) {
+                
+                var extensions = Game.spawns['Spawn1'].room.find(FIND_STRUCTURES, {
+                    filter: (structure) => { return (structure.structureType == STRUCTURE_EXTENSION)  }
+                })
+                
+                var startPos = Game.spawns['Spawn1'].pos
+
+                for (let index = 0; index < extensions.length; index++) {
+                    var targetPos = extensions[index].pos 
+                    console.log('• [' + roomName + '] Building road from: '+startPos.x+'.'+startPos.y+' to '+targetPos.x+'.'+targetPos.y)
+                    const path = Game.spawns['Spawn1'].room.findPath(startPos, targetPos)
+                    for (let index = 0; index < path.length; index++) {
+                        const element = path[index];
+                        Game.rooms[roomName].createConstructionSite(element.x, element.y, 'road', 'Rd' + index)
+                    }                    
+                }
+                spawnToExtensionRoads = false
+            }
+
+            /** Roads: Spawn->Control */
+            if (spawnToControlRoads == true) {
+                var startPos  = Game.spawns['Spawn1'].pos
+                var targetPos =  Game.rooms[roomName].controller.pos
+                console.log('• [' + roomName + '] Building road from: '+startPos.x+'.'+startPos.y+' to '+targetPos.x+'.'+targetPos.y)
+                const path = Game.spawns['Spawn1'].room.findPath(startPos, targetPos)
+                for (let index = 0; index < path.length; index++) {
+                    const element = path[index];
+                    Game.rooms[roomName].createConstructionSite(element.x, element.y, 'road', 'Rd' + index)
+                }                    
+                spawnToControlRoads = false
             }
 
         }
@@ -129,6 +163,10 @@ module.exports.loop = function () {
             var currentEnergy = utilRoom.getEnergy(roomName)
             console.log('• Room ' + roomName + ' has ' + currentEnergy + ' energy available.');
             console.log('• Room ' + roomName + ' Construction work to do: ' + utilRoom.hasConstructionSites(roomName))
+
+            console.log('• Room ' + roomName + ' Roads: Spawn->Sources     : ' + util.boolToDone(spawnToSourceRoads))
+            console.log('• Room ' + roomName + ' Roads: Spawn->Extensions  : ' + util.boolToDone(spawnToExtensionRoads))
+            console.log('• Room ' + roomName + ' Roads: Spawn->Control     : ' + util.boolToDone(spawnToControlRoads))
             console.log('-------------------------------------------------')
             infoTimestamp = Game.time
         }
