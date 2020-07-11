@@ -27,7 +27,7 @@ var utilRoom = {
     /** @param {string} roomName */
     getBrokenStructures: function(roomName) {
         var retVal = []
-        var structures = Game.rooms[roomName].find(FIND_MY_STRUCTURES)
+        var structures = Game.rooms[roomName].find(FIND_STRUCTURES)
         for (let index = 0; index < structures.length; index++) {
             const element = structures[index];
             if (element.hits < element.hitsMax) {

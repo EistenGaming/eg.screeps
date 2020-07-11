@@ -41,28 +41,64 @@ module.exports.loop = function () {
             var builders  = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
             var maintainers  = _.filter(Game.creeps, (creep) => creep.memory.role == 'maintainer');
         
-            if(harvesters.length < 4 && currentEnergy >= 200) {
+            if(harvesters.length < 4) {
+                var bodySetup = []
+                if (currentEnergy >= 400) {
+                    bodySetup = [WORK,WORK,CARRY,CARRY,MOVE,MOVE]
+                }
+                else if (currentEnergy >= 300) {
+                    bodySetup = [WORK,CARRY,CARRY,MOVE,MOVE]
+                } else {
+                    bodySetup = [WORK,CARRY,MOVE]
+                }
                 var newName = 'Harvester' + Game.time;
                 console.log('• Spawning new harvester: ' + newName);
                 Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
                     {memory: {role: 'harvester'}});
             }
         
-            if(upgraders.length < 3 && currentEnergy >= 200) {
+            if(upgraders.length < 4 ) {
+                var bodySetup = []
+                if (currentEnergy >= 400) {
+                    bodySetup = [WORK,WORK,CARRY,CARRY,MOVE,MOVE]
+                }
+                else if (currentEnergy >= 300) {
+                    bodySetup = [WORK,CARRY,CARRY,MOVE,MOVE]
+                } else {
+                    bodySetup = [WORK,CARRY,MOVE]
+                }
                 var newName = 'Upgrader' + Game.time;
                 console.log('• Spawning new upgrader: ' + newName);
-                Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
+                Game.spawns['Spawn1'].spawnCreep(bodySetup, newName, 
                     {memory: {role: 'upgrader'}});
             }
         
-            if(builders.length < 3 && currentEnergy >= 200 && utilRoom.hasConstructionSites(roomName) == true) {
+            if(builders.length < 4 && utilRoom.hasConstructionSites(roomName) == true) {
+                var bodySetup = []
+                if (currentEnergy >= 400) {
+                    bodySetup = [WORK,WORK,WORK,CARRY,MOVE]
+                }
+                else if (currentEnergy >= 300) {
+                    bodySetup = [WORK,WORK,CARRY,MOVE]
+                } else {
+                    bodySetup = [WORK,CARRY,MOVE]
+                }
                 var newName = 'Builder' + Game.time;
                 console.log('• Spawning new builder: ' + newName);
                 Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
                     {memory: {role: 'builder'}});
             }
 
-            if(maintainers.length < 2 && currentEnergy >= 200) { // TODO: WHEN to spawn them should depend on broken structures
+            if(maintainers.length < 3 ) { // TODO: WHEN to spawn them should depend on broken structures
+                var bodySetup = []
+                if (currentEnergy >= 400) {
+                    bodySetup = [WORK,WORK,CARRY,CARRY,MOVE,MOVE]
+                }
+                else if (currentEnergy >= 300) {
+                    bodySetup = [WORK,CARRY,CARRY,MOVE,MOVE]
+                } else {
+                    bodySetup = [WORK,CARRY,MOVE]
+                }
                 var newName = 'Maintainer' + Game.time;
                 console.log('• Spawning new maintainer: ' + newName);
                 Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
@@ -80,7 +116,8 @@ module.exports.loop = function () {
                 Game.spawns['Spawn1'].pos.y, 
                 {align: 'left', opacity: 0.8});
         }
-
+        var totalActiveCreeps = harvesters.length + upgraders.length + builders.length + maintainers.length
+        console.log('• Total active creeps: ' + totalActiveCreeps)
         console.log('• Harvesters: ' + harvesters.length + ' | Upgraders: ' + upgraders.length+ ' | Builders: ' + builders.length + ' | Maintainers: ' + maintainers.length);
         console.log('-------------------------------------------------')
         spawnTimestamp = Game.time
