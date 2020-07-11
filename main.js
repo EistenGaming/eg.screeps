@@ -1,6 +1,7 @@
 var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
+var roleMaintainer = require('role.maintainer');
 var utilRoom = require('util.room');
 var util = require('util');
 var spawnTickDelay = 50
@@ -38,6 +39,7 @@ module.exports.loop = function () {
             var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
             var upgraders  = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
             var builders  = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
+            var maintainers  = _.filter(Game.creeps, (creep) => creep.memory.role == 'maintainer');
         
             if(harvesters.length < 4 && currentEnergy >= 200) {
                 var newName = 'Harvester' + Game.time;
@@ -53,11 +55,18 @@ module.exports.loop = function () {
                     {memory: {role: 'upgrader'}});
             }
         
-            if(builders.length < 5 && currentEnergy >= 200 && utilRoom.hasConstructionSites(roomName) == true) {
+            if(builders.length < 3 && currentEnergy >= 200 && utilRoom.hasConstructionSites(roomName) == true) {
                 var newName = 'Builder' + Game.time;
                 console.log('• Spawning new builder: ' + newName);
                 Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
                     {memory: {role: 'builder'}});
+            }
+
+            if(maintainers.length < 2 && currentEnergy >= 200) { // TODO: WHEN to spawn them should depend on broken structures
+                var newName = 'Maintainer' + Game.time;
+                console.log('• Spawning new maintainer: ' + newName);
+                Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
+                    {memory: {role: 'maintainer'}});
             }
 
         }
@@ -72,7 +81,7 @@ module.exports.loop = function () {
                 {align: 'left', opacity: 0.8});
         }
 
-        console.log('• Harvesters: ' + harvesters.length + ' | Upgraders: ' + upgraders.length+ ' | Builders: ' + builders.length);
+        console.log('• Harvesters: ' + harvesters.length + ' | Upgraders: ' + upgraders.length+ ' | Builders: ' + builders.length + ' | Maintainers: ' + maintainers.length);
         console.log('-------------------------------------------------')
         spawnTimestamp = Game.time
     }
@@ -213,6 +222,9 @@ module.exports.loop = function () {
         }
         if(creep.memory.role == 'builder') {
             roleBuilder.run(creep);
+        }
+        if(creep.memory.role == 'maintainer') {
+            roleMaintainer.run(creep);
         }
     }
 }

@@ -25,6 +25,19 @@ var utilRoom = {
     },
 
     /** @param {string} roomName */
+    getBrokenStructures: function(roomName) {
+        var retVal = []
+        var structures = Game.rooms[roomName].find(FIND_MY_STRUCTURES)
+        for (let index = 0; index < structures.length; index++) {
+            const element = structures[index];
+            if (element.hits < element.hitsMax) {
+                retVal.push(element)
+            }
+        }
+        return retVal
+    },
+
+    /** @param {string} roomName */
     hasConstructionSites: function(roomName) {
         val = false
         var constructionSites = Game.rooms[roomName].find(FIND_MY_CONSTRUCTION_SITES)
