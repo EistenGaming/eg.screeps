@@ -259,6 +259,14 @@ module.exports.loop = function () {
                 spawnToControlRoads = false
             }
 
+            /** Mineral Sites - Valid at controller level 6 or higher */
+            if (controllerLevel >= 6) {
+                var mineralSites = utilRoom.findMinerals(roomName)
+                for (let index = 0; index < mineralSites; index++) {
+                    console.log('• [' + roomName + '] Building mineral extractor of type [' + mineralSites[index].mineralType + ']')
+                    Game.rooms[roomName].createConstructionSite(mineralSites[index].pos.x, mineralSites[index].pos.y, 'extractor', 'Extractor' + index)
+                }
+            }
         }
 
         /** if there are construction sites in the room, create builders. Dont if there aren't any */

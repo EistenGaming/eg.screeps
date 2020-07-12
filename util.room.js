@@ -47,6 +47,19 @@ var utilRoom = {
             val = false
         }
         return val
+    },
+
+    /** @param {string} roomName */
+    findMinerals: function(roomName) {
+        var val = []
+        var mineralSites = Game.rooms[roomName].find(FIND_MINERALS)
+        for (let index = 0; index < mineralSites.length; index++) {
+            const element = mineralSites[index];
+            if (element.mineralAmount > 0) {
+                val.push(element)
+            }
+        }
+        return val
     }
 };
 
