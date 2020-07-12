@@ -15,6 +15,10 @@ var spawnToSourceRoads = true
 var spawnToExtensionRoads = true
 var spawnToControlRoads = true
 var sourcesToControl = true
+var noOfHarvestersPerRoom = 2
+var noOfBuildersPerRoom = 2
+var noOfUpgradersPerRoom = 2
+var noOfMaintainersPerRoom = 2
 
 module.exports.loop = function () {
 
@@ -41,7 +45,7 @@ module.exports.loop = function () {
             var builders  = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
             var maintainers  = _.filter(Game.creeps, (creep) => creep.memory.role == 'maintainer');
         
-            if(harvesters.length < 4) {
+            if(harvesters.length < noOfHarvestersPerRoom ) {
                 var bodySetup = []
                 if (currentEnergy >= 400) {
                     bodySetup = [WORK,WORK,CARRY,CARRY,MOVE,MOVE]
@@ -57,7 +61,7 @@ module.exports.loop = function () {
                     {memory: {role: 'harvester'}});
             }
         
-            if(upgraders.length < 4 ) {
+            if(upgraders.length < noOfUpgradersPerRoom && harvesters.length == noOfHarvestersPerRoom) {
                 var bodySetup = []
                 if (currentEnergy >= 400) {
                     bodySetup = [WORK,WORK,CARRY,CARRY,MOVE,MOVE]
@@ -73,7 +77,7 @@ module.exports.loop = function () {
                     {memory: {role: 'upgrader'}});
             }
         
-            if(builders.length < 4 && utilRoom.hasConstructionSites(roomName) == true) {
+            if(builders.length < noOfBuildersPerRoom && utilRoom.hasConstructionSites(roomName) == true && upgraders.length == noOfUpgradersPerRoom) {
                 var bodySetup = []
                 if (currentEnergy >= 400) {
                     bodySetup = [WORK,WORK,WORK,CARRY,MOVE]
@@ -89,7 +93,7 @@ module.exports.loop = function () {
                     {memory: {role: 'builder'}});
             }
 
-            if(maintainers.length < 3 ) { // TODO: WHEN to spawn them should depend on broken structures
+            if(maintainers.length < noOfMaintainersPerRoom && upgraders.length == noOfUpgradersPerRoom) { // TODO: WHEN to spawn them should depend on broken structures
                 var bodySetup = []
                 if (currentEnergy >= 400) {
                     bodySetup = [WORK,WORK,CARRY,CARRY,MOVE,MOVE]
@@ -135,24 +139,59 @@ module.exports.loop = function () {
             switch (controllerLevel) {
                 case 2:
                     targetExtensionCount = 5
+
+                    noOfHarvestersPerRoom = 4
+                    noOfBuildersPerRoom = 3
+                    noOfUpgradersPerRoom = 4
+                    noOfMaintainersPerRoom = 2
                     break;
                 case 3:
                     targetExtensionCount = 10
+
+                    noOfHarvestersPerRoom = 6
+                    noOfBuildersPerRoom = 5
+                    noOfUpgradersPerRoom = 6
+                    noOfMaintainersPerRoom = 4
                     break;
                 case 4:
                     targetExtensionCount = 20
+
+                    noOfHarvestersPerRoom = 10
+                    noOfBuildersPerRoom = 7
+                    noOfUpgradersPerRoom = 8
+                    noOfMaintainersPerRoom = 6
                     break;
                 case 5:
                     targetExtensionCount = 30
+
+                    noOfHarvestersPerRoom = 20
+                    noOfBuildersPerRoom = 8
+                    noOfUpgradersPerRoom = 10
+                    noOfMaintainersPerRoom = 8
                     break;
                 case 6:
                     targetExtensionCount = 40
+
+                    noOfHarvestersPerRoom = 30
+                    noOfBuildersPerRoom = 10
+                    noOfUpgradersPerRoom = 15
+                    noOfMaintainersPerRoom = 10
                     break;
                 case 7:
                     targetExtensionCount = 50
+
+                    noOfHarvestersPerRoom = 40
+                    noOfBuildersPerRoom = 10
+                    noOfUpgradersPerRoom = 15
+                    noOfMaintainersPerRoom = 10
                     break;
                 case 8:
                     targetExtensionCount = 60
+
+                    noOfHarvestersPerRoom = 50
+                    noOfBuildersPerRoom = 15
+                    noOfUpgradersPerRoom = 8
+                    noOfMaintainersPerRoom = 20
                     break;
                 default:
                     break;
@@ -236,7 +275,7 @@ module.exports.loop = function () {
             console.log('GAME INFO ['+roomName+']')
             var currentEnergy = utilRoom.getEnergy(roomName)
             console.log('• Room ' + roomName + ' has ' + currentEnergy + ' energy available.');
-            console.log('• Room ' + roomName + ' Construction work to do: ' + utilRoom.hasConstructionSites(roomName))
+            console.log('• Room ' + roomName + ' Construction work to do   : ' + utilRoom.hasConstructionSites(roomName))
 
             console.log('• Room ' + roomName + ' Roads: Spawn->Sources     : ' + util.boolToDone(spawnToSourceRoads))
             console.log('• Room ' + roomName + ' Roads: Spawn->Extensions  : ' + util.boolToDone(spawnToExtensionRoads))
