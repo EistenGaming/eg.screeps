@@ -93,7 +93,7 @@ module.exports.loop = function () {
                     {memory: {role: 'builder'}});
             }
 
-            if(maintainers.length < noOfMaintainersPerRoom && upgraders.length == noOfUpgradersPerRoom) { // TODO: WHEN to spawn them should depend on broken structures
+            if(maintainers.length < noOfMaintainersPerRoom && upgraders.length == noOfUpgradersPerRoom && !utilRoom.hasConstructionSites(roomName) ) { // TODO: WHEN to spawn them should depend on broken structures
                 var bodySetup = []
                 if (currentEnergy >= 400) {
                     bodySetup = [WORK,WORK,CARRY,CARRY,MOVE,MOVE]
@@ -180,7 +180,7 @@ module.exports.loop = function () {
                 case 7:
                     targetExtensionCount = 50
 
-                    noOfHarvestersPerRoom = 40
+                    noOfHarvestersPerRoom = 30
                     noOfBuildersPerRoom = 10
                     noOfUpgradersPerRoom = 15
                     noOfMaintainersPerRoom = 10
@@ -188,7 +188,7 @@ module.exports.loop = function () {
                 case 8:
                     targetExtensionCount = 60
 
-                    noOfHarvestersPerRoom = 50
+                    noOfHarvestersPerRoom = 30
                     noOfBuildersPerRoom = 15
                     noOfUpgradersPerRoom = 8
                     noOfMaintainersPerRoom = 20
