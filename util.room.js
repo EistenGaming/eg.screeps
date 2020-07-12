@@ -23,6 +23,32 @@ var utilRoom = {
         }
         return validTiles
     },
+    
+    /** @param {string} roomName */
+    getValidTilesCloseTo: function(roomName, position) {
+        var validTiles = []
+        var validTilesCloseTo = []
+        const terrain = new Room.Terrain(roomName)
+        for(let y = 0; y < 50; y++) {
+            for(let x = 0; x < 50; x++) {
+                const tile = terrain.get(x, y);
+                const weight =
+                tile === TERRAIN_MASK_WALL  ? 255 : // wall  => unwalkable
+                tile === TERRAIN_MASK_SWAMP ?   5 : // swamp => weight:  5
+                                                1 ; // plain => weight:  1
+                if (weight <= 1) {
+                    validTiles.push([x,y])
+                }
+            }
+        }
+        for (let index = 0; index < validTiles.length; index++) {
+            const element = validTiles[index];
+            if (position.inRangeTo(element.x, element.y, 3)) {
+                validTilesCloseTo.push(element)
+            }
+        }
+        return validTilesCloseTo
+    },
 
     /** @param {string} roomName */
     getBrokenStructures: function(roomName) {
