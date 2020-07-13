@@ -255,15 +255,15 @@ module.exports.loop = function () {
             /** Tower 1 */
             if (controllerLevel >= 3) {
                 console.log('• [' + roomName + '] Building tower 1.')
-                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 1)
-                console.log('tower1 x: ' + validTiles[0][0] + ' y: ' + validTiles[0][1])
+                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 2)
+                //console.log('validtiles: ' + validTiles[0][1])
                 Game.rooms[roomName].createConstructionSite(validTiles[0][0], validTiles[0][1], 'tower', 'tower1')
             }
             
             /** Storage - Stores huge amounts of resources (one per room) */
             if (controllerLevel >= 4) {
                 console.log('• [' + roomName + '] Building storage.')
-                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 1)
+                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 2)
                 Game.rooms[roomName].createConstructionSite(validTiles[0][0], validTiles[0][1], 'storage', 'Storage')
             }
 
