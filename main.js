@@ -193,7 +193,8 @@ module.exports.loop = function () {
                     break;
             }
 
-            var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 3)
+            var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 5)
+            console.log('valid tiles #: ' +validTiles.length)
             var extensions = _.filter(Game.structures, (structure) => structure.structureType == 'extension'); /** TODO: Check if this is per room? Attention: Construction sites of type 'extension' != extensions!*/
             if (extensions.length < targetExtensionCount) {
                 console.log('• [' + roomName + '] Building extension: '+extensions.length+' of ['+targetExtensionCount+']')
@@ -255,7 +256,7 @@ module.exports.loop = function () {
             /** Tower 1 */
             if (controllerLevel >= 3) {
                 console.log('• [' + roomName + '] Building tower 1.')
-                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 2)
+                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 5)
                 //console.log('validtiles: ' + validTiles[0][1])
                 Game.rooms[roomName].createConstructionSite(validTiles[0][0], validTiles[0][1], 'tower', 'tower1')
             }
@@ -263,14 +264,14 @@ module.exports.loop = function () {
             /** Storage - Stores huge amounts of resources (one per room) */
             if (controllerLevel >= 4) {
                 console.log('• [' + roomName + '] Building storage.')
-                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 2)
+                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 5)
                 Game.rooms[roomName].createConstructionSite(validTiles[0][0], validTiles[0][1], 'storage', 'Storage')
             }
 
             /** Tower 1 */
             if (controllerLevel >= 5) {
                 console.log('• [' + roomName + '] Building tower 2.')
-                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos,3)
+                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos,5)
                 Game.rooms[roomName].createConstructionSite(validTiles[0][0], validTiles[0][1], 'tower', 'tower2')
             }
             
