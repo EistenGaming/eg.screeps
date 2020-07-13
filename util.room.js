@@ -36,14 +36,16 @@ var utilRoom = {
                 tile === TERRAIN_MASK_WALL  ? 255 : // wall  => unwalkable
                 tile === TERRAIN_MASK_SWAMP ?   5 : // swamp => weight:  5
                                                 1 ; // plain => weight:  1
-                if (weight <= 1) {
+                                                
+                var objAtPos = Game.rooms[roomName].lookAt(x, y)
+                if (weight <= 1 && objAtPos.length <=1 ) { // Check for other structures as well
                     validTiles.push([x,y])
                 }
             }
         }
         for (let index = 0; index < validTiles.length; index++) {
             const element = validTiles[index];
-            if (position.inRangeTo(element.x, element.y, 3)) {
+            if (position.inRangeTo(element[0], element[1], 3)) {
                 validTilesCloseTo.push(element)
             }
         }

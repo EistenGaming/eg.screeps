@@ -11,10 +11,6 @@ var infoTimestamp = 0
 var spawnTimestamp = 0
 var structureTimestamp = 0
 var targetExtensionCount = 0
-var spawnToSourceRoads = true
-var spawnToExtensionRoads = true
-var spawnToControlRoads = true
-var sourcesToControl = true
 var noOfHarvestersPerRoom = 2
 var noOfBuildersPerRoom = 2
 var noOfUpgradersPerRoom = 2
@@ -143,7 +139,7 @@ module.exports.loop = function () {
                     noOfHarvestersPerRoom = 4
                     noOfBuildersPerRoom = 3
                     noOfUpgradersPerRoom = 4
-                    noOfMaintainersPerRoom = 2
+                    noOfMaintainersPerRoom = 0
                     break;
                 case 3:
                     targetExtensionCount = 10
@@ -151,7 +147,7 @@ module.exports.loop = function () {
                     noOfHarvestersPerRoom = 6
                     noOfBuildersPerRoom = 5
                     noOfUpgradersPerRoom = 6
-                    noOfMaintainersPerRoom = 4
+                    noOfMaintainersPerRoom = 0
                     break;
                 case 4:
                     targetExtensionCount = 20
@@ -159,45 +155,46 @@ module.exports.loop = function () {
                     noOfHarvestersPerRoom = 10
                     noOfBuildersPerRoom = 7
                     noOfUpgradersPerRoom = 8
-                    noOfMaintainersPerRoom = 6
+                    noOfMaintainersPerRoom = 0
                     break;
                 case 5:
                     targetExtensionCount = 30
 
-                    noOfHarvestersPerRoom = 20
+                    noOfHarvestersPerRoom = 15
                     noOfBuildersPerRoom = 8
                     noOfUpgradersPerRoom = 10
-                    noOfMaintainersPerRoom = 8
+                    noOfMaintainersPerRoom = 0
                     break;
                 case 6:
                     targetExtensionCount = 40
 
-                    noOfHarvestersPerRoom = 30
+                    noOfHarvestersPerRoom = 15
                     noOfBuildersPerRoom = 10
-                    noOfUpgradersPerRoom = 15
-                    noOfMaintainersPerRoom = 10
+                    noOfUpgradersPerRoom = 10
+                    noOfMaintainersPerRoom = 0
                     break;
                 case 7:
                     targetExtensionCount = 50
 
-                    noOfHarvestersPerRoom = 30
+                    noOfHarvestersPerRoom = 15
                     noOfBuildersPerRoom = 10
-                    noOfUpgradersPerRoom = 15
-                    noOfMaintainersPerRoom = 10
+                    noOfUpgradersPerRoom = 10
+                    noOfMaintainersPerRoom = 0
                     break;
                 case 8:
                     targetExtensionCount = 60
 
-                    noOfHarvestersPerRoom = 30
+                    noOfHarvestersPerRoom = 15
                     noOfBuildersPerRoom = 15
-                    noOfUpgradersPerRoom = 8
-                    noOfMaintainersPerRoom = 20
+                    noOfUpgradersPerRoom = 4
+                    noOfMaintainersPerRoom = 0
                     break;
                 default:
                     break;
             }
 
-            var validTiles = utilRoom.getValidTiles(roomName)
+            // var validTiles = utilRoom.getValidTiles(roomName) // TODO: use getValidTilesCloseTo insteal (around spawn1)
+            var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos)
             var extensions = _.filter(Game.structures, (structure) => structure.structureType == 'extension'); /** TODO: Check if this is per room? Attention: Construction sites of type 'extension' != extensions!*/
             if (extensions.length < targetExtensionCount) {
                 console.log('• [' + roomName + '] Building extension: '+extensions.length+' of ['+targetExtensionCount+']')
@@ -209,64 +206,93 @@ module.exports.loop = function () {
             }
             
             /** Roads: Spawn->Sources */
-            if (spawnToSourceRoads == true) {
-                var sources = Game.spawns['Spawn1'].room.find(FIND_SOURCES);
-                var startPos = Game.spawns['Spawn1'].pos
+            // if (spawnToSourceRoads == true) {
+            //     var sources = Game.spawns['Spawn1'].room.find(FIND_SOURCES);
+            //     var startPos = Game.spawns['Spawn1'].pos
 
-                for (let index = 0; index < sources.length; index++) {
-                    var targetPos = sources[index].pos 
-                    console.log('• [' + roomName + '] Building road from: '+startPos.x+'.'+startPos.y+' to '+targetPos.x+'.'+targetPos.y)
-                    const path = Game.spawns['Spawn1'].room.findPath(startPos, targetPos)
-                    for (let index = 0; index < path.length; index++) {
-                        const element = path[index];
-                        Game.rooms[roomName].createConstructionSite(element.x, element.y, 'road', 'Rd' + index)
-                    }                    
-                }
-                spawnToSourceRoads = false
-            }
+            //     for (let index = 0; index < sources.length; index++) {
+            //         var targetPos = sources[index].pos 
+            //         console.log('• [' + roomName + '] Building road from: '+startPos.x+'.'+startPos.y+' to '+targetPos.x+'.'+targetPos.y)
+            //         const path = Game.spawns['Spawn1'].room.findPath(startPos, targetPos)
+            //         for (let index = 0; index < path.length; index++) {
+            //             const element = path[index];
+            //             Game.rooms[roomName].createConstructionSite(element.x, element.y, 'road', 'Rd' + index)
+            //         }                    
+            //     }
+            // }
 
             /** Roads: Spawn->Extensions */
-            if (spawnToExtensionRoads == true) {
+            // if (spawnToExtensionRoads == true) {
                 
-                var extensions = Game.spawns['Spawn1'].room.find(FIND_STRUCTURES, {
-                    filter: (structure) => { return (structure.structureType == STRUCTURE_EXTENSION)  }
-                })
+            //     var extensions = Game.spawns['Spawn1'].room.find(FIND_STRUCTURES, {
+            //         filter: (structure) => { return (structure.structureType == STRUCTURE_EXTENSION)  }
+            //     })
                 
-                var startPos = Game.spawns['Spawn1'].pos
+            //     var startPos = Game.spawns['Spawn1'].pos
 
-                for (let index = 0; index < extensions.length; index++) {
-                    var targetPos = extensions[index].pos 
-                    console.log('• [' + roomName + '] Building road from: '+startPos.x+'.'+startPos.y+' to '+targetPos.x+'.'+targetPos.y)
-                    const path = Game.spawns['Spawn1'].room.findPath(startPos, targetPos)
-                    for (let index = 0; index < path.length; index++) {
-                        const element = path[index];
-                        Game.rooms[roomName].createConstructionSite(element.x, element.y, 'road', 'Rd' + index)
-                    }                    
-                }
-                spawnToExtensionRoads = false
-            }
+            //     for (let index = 0; index < extensions.length; index++) {
+            //         var targetPos = extensions[index].pos 
+            //         console.log('• [' + roomName + '] Building road from: '+startPos.x+'.'+startPos.y+' to '+targetPos.x+'.'+targetPos.y)
+            //         const path = Game.spawns['Spawn1'].room.findPath(startPos, targetPos)
+            //         for (let index = 0; index < path.length; index++) {
+            //             const element = path[index];
+            //             Game.rooms[roomName].createConstructionSite(element.x, element.y, 'road', 'Rd' + index)
+            //         }                    
+            //     }
+            // }
 
             /** Roads: Spawn->Control */
-            if (spawnToControlRoads == true) {
-                var startPos  = Game.spawns['Spawn1'].pos
-                var targetPos =  Game.rooms[roomName].controller.pos
-                console.log('• [' + roomName + '] Building road from: '+startPos.x+'.'+startPos.y+' to '+targetPos.x+'.'+targetPos.y)
-                const path = Game.spawns['Spawn1'].room.findPath(startPos, targetPos)
-                for (let index = 0; index < path.length; index++) {
-                    const element = path[index];
-                    Game.rooms[roomName].createConstructionSite(element.x, element.y, 'road', 'Rd' + index)
-                }                    
-                spawnToControlRoads = false
+            // if (spawnToControlRoads == true) {
+            //     var startPos  = Game.spawns['Spawn1'].pos
+            //     var targetPos =  Game.rooms[roomName].controller.pos
+            //     console.log('• [' + roomName + '] Building road from: '+startPos.x+'.'+startPos.y+' to '+targetPos.x+'.'+targetPos.y)
+            //     const path = Game.spawns['Spawn1'].room.findPath(startPos, targetPos)
+            //     for (let index = 0; index < path.length; index++) {
+            //         const element = path[index];
+            //         Game.rooms[roomName].createConstructionSite(element.x, element.y, 'road', 'Rd' + index)
+            //     }                    
+            // }
+            
+            /** Tower 1 */
+            if (controllerLevel >= 3) {
+                console.log('• [' + roomName + '] Building tower 1.')
+                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos)
+                console.log('tower1 x: ' + validTiles[0][0] + ' y: ' + validTiles[0][1])
+                Game.rooms[roomName].createConstructionSite(validTiles[0][0], validTiles[0][1], 'tower', 'tower1')
+            }
+            
+            /** Storage - Stores huge amounts of resources (one per room) */
+            if (controllerLevel >= 4) {
+                console.log('• [' + roomName + '] Building storage.')
+                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos)
+                Game.rooms[roomName].createConstructionSite(validTiles[0][0], validTiles[0][1], 'storage', 'Storage')
             }
 
+            /** Tower 1 */
+            if (controllerLevel >= 5) {
+                console.log('• [' + roomName + '] Building tower 2.')
+                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos)
+                Game.rooms[roomName].createConstructionSite(validTiles[0][0], validTiles[0][1], 'tower', 'tower2')
+            }
+            
             /** Mineral Sites - Valid at controller level 6 or higher */
             if (controllerLevel >= 6) {
                 var mineralSites = utilRoom.findMinerals(roomName)
-                for (let index = 0; index < mineralSites; index++) {
-                    console.log('• [' + roomName + '] Building mineral extractor of type [' + mineralSites[index].mineralType + ']')
-                    Game.rooms[roomName].createConstructionSite(mineralSites[index].pos.x, mineralSites[index].pos.y, 'extractor', 'Extractor' + index)
-                }
+                console.log('• [' + roomName + '] has ' + mineralSites.length + ' mineral sites present.' )
+                console.log('• [' + roomName + '] Building mineral extractor of type [' + mineralSites[0].mineralType + ']')
+                Game.rooms[roomName].createConstructionSite(mineralSites[0].pos.x, mineralSites[0].pos.y, 'extractor', 'Extractor'+mineralSites[0].mineralType)
             }
+            
+
+            /** Labs - produces mineral compounds, buusts and unboosts creeps */
+
+            /** Terminal - send resources from one room to another one */
+
+            /** Links - Transfers energy from point to point in one room*/
+
+            
+
+            /** Walls / Ramparts */
         }
 
         /** if there are construction sites in the room, create builders. Dont if there aren't any */
@@ -285,16 +311,37 @@ module.exports.loop = function () {
             console.log('• Room ' + roomName + ' has ' + currentEnergy + ' energy available.');
             console.log('• Room ' + roomName + ' Construction work to do   : ' + utilRoom.hasConstructionSites(roomName))
 
-            console.log('• Room ' + roomName + ' Roads: Spawn->Sources     : ' + util.boolToDone(spawnToSourceRoads))
-            console.log('• Room ' + roomName + ' Roads: Spawn->Extensions  : ' + util.boolToDone(spawnToExtensionRoads))
-            console.log('• Room ' + roomName + ' Roads: Spawn->Control     : ' + util.boolToDone(spawnToControlRoads))
             console.log('-------------------------------------------------')
             infoTimestamp = Game.time
         }
     }
 
-
-
+    /** Tower Control */
+    for(var roomName in Game.rooms) {
+        var controllerLevel = Game.rooms[roomName].controller.level
+        if (controllerLevel >= 3) {
+            /** Defense */
+            var hostiles = Game.rooms[roomName].find(FIND_HOSTILE_CREEPS);
+            if(hostiles.length > 0) {
+                var username = hostiles[0].owner.username;
+                Game.notify(`User ${username} spotted in room ${roomName}`);
+                var towers = Game.rooms[roomName].find(
+                    FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
+                towers.forEach(tower => tower.attack(hostiles[0]));
+            }
+            /** Repair */
+            var structures =  Game.rooms[roomName].find(FIND_STRUCTURES) // Why is FIND_MY_STRUCTURES not finding roads?
+            for (let index = 0; index < structures.length; index++) {
+                const element = structures[index];
+                if (element.hits < element.hitsMax) {
+                    Game.notify('• Room ' + roomName + ' reapairing structure.');
+                    var towers = Game.rooms[roomName].find(
+                        FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
+                    towers.forEach(tower => tower.repair(element))
+                }
+            }
+        }
+    }
     /** Role assignment & run*/
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
