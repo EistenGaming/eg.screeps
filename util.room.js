@@ -25,7 +25,7 @@ var utilRoom = {
     },
     
     /** @param {string} roomName */
-    getValidTilesCloseTo: function(roomName, position) {
+    getValidTilesCloseTo: function(roomName, position, range) {
         var validTiles = []
         var validTilesCloseTo = []
         const terrain = new Room.Terrain(roomName)
@@ -45,7 +45,7 @@ var utilRoom = {
         }
         for (let index = 0; index < validTiles.length; index++) {
             const element = validTiles[index];
-            if (position.inRangeTo(element[0], element[1], 3)) {
+            if (position.inRangeTo(element[0], element[1], range)) {
                 validTilesCloseTo.push(element)
             }
         }
