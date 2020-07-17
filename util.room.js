@@ -29,8 +29,8 @@ var utilRoom = {
         var validTiles = []
         var validTilesCloseTo = []
         const terrain = new Room.Terrain(roomName)
-        for(let y = 0; y < 50; y++) {
-            for(let x = 0; x < 50; x++) {
+        for(let y = 0; y < 50; y++ ) {
+            for(let x = 0; x < 50; ) {
                 const tile = terrain.get(x, y);
                 const weight =
                 tile === TERRAIN_MASK_WALL  ? 255 : // wall  => unwalkable
@@ -41,6 +41,7 @@ var utilRoom = {
                 if (weight <= 1 && objAtPos.length <=1 ) { // Check for other structures as well
                     validTiles.push([x,y])
                 }
+                x = x + 2
             }
         }
         for (let index = 0; index < validTiles.length; index++) {

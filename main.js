@@ -2,6 +2,7 @@ var roleHarvester = require('role.harvester');
 var roleUpgrader = require('role.upgrader');
 var roleBuilder = require('role.builder');
 var roleMaintainer = require('role.maintainer');
+var roleMiner = require('role.miner');
 var utilRoom = require('util.room');
 var util = require('util');
 var spawnTickDelay = 50
@@ -15,6 +16,8 @@ var noOfHarvestersPerRoom = 2
 var noOfBuildersPerRoom = 2
 var noOfUpgradersPerRoom = 2
 var noOfMaintainersPerRoom = 2
+var noOfMinersPerRoom = 2
+var roomResourceType = ''
 
 module.exports.loop = function () {
 
@@ -40,7 +43,10 @@ module.exports.loop = function () {
             var upgraders  = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
             var builders  = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
             var maintainers  = _.filter(Game.creeps, (creep) => creep.memory.role == 'maintainer');
+            var miners = _.filter(Game.creeps, (creep) => creep.memory.role == 'miner');
         
+            var controllerLevel = Game.spawns['Spawn1'].room.controller.level
+
             if(harvesters.length < noOfHarvestersPerRoom ) {
                 var bodySetup = []
                 if (currentEnergy >= 400) {
@@ -105,6 +111,22 @@ module.exports.loop = function () {
                     {memory: {role: 'maintainer'}});
             }
 
+            if(miners.length < noOfMinersPerRoom && controllerLevel >= 4 ) {
+                var bodySetup = []
+                if (currentEnergy >= 400) {
+                    bodySetup = [WORK,WORK,CARRY,CARRY,MOVE,MOVE]
+                }
+                else if (currentEnergy >= 300) {
+                    bodySetup = [WORK,CARRY,CARRY,MOVE,MOVE]
+                } else {
+                    bodySetup = [WORK,CARRY,MOVE]
+                }
+                var newName = 'Miner' + Game.time;
+                console.log('• Spawning new miner: ' + newName);
+                Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
+                    {memory: {role: 'miner'}});
+            }
+
         }
 
             /** Spawning notifications */
@@ -140,6 +162,7 @@ module.exports.loop = function () {
                     noOfBuildersPerRoom = 3
                     noOfUpgradersPerRoom = 4
                     noOfMaintainersPerRoom = 0
+                    noOfMinersPerRoom = 0
                     break;
                 case 3:
                     targetExtensionCount = 10
@@ -148,6 +171,7 @@ module.exports.loop = function () {
                     noOfBuildersPerRoom = 5
                     noOfUpgradersPerRoom = 6
                     noOfMaintainersPerRoom = 0
+                    noOfMinersPerRoom = 0
                     break;
                 case 4:
                     targetExtensionCount = 20
@@ -156,6 +180,7 @@ module.exports.loop = function () {
                     noOfBuildersPerRoom = 7
                     noOfUpgradersPerRoom = 8
                     noOfMaintainersPerRoom = 0
+                    noOfMinersPerRoom = 2
                     break;
                 case 5:
                     targetExtensionCount = 30
@@ -164,6 +189,7 @@ module.exports.loop = function () {
                     noOfBuildersPerRoom = 8
                     noOfUpgradersPerRoom = 10
                     noOfMaintainersPerRoom = 0
+                    noOfMinersPerRoom = 4
                     break;
                 case 6:
                     targetExtensionCount = 40
@@ -172,6 +198,7 @@ module.exports.loop = function () {
                     noOfBuildersPerRoom = 10
                     noOfUpgradersPerRoom = 10
                     noOfMaintainersPerRoom = 0
+                    noOfMinersPerRoom = 4
                     break;
                 case 7:
                     targetExtensionCount = 50
@@ -180,6 +207,7 @@ module.exports.loop = function () {
                     noOfBuildersPerRoom = 10
                     noOfUpgradersPerRoom = 10
                     noOfMaintainersPerRoom = 0
+                    noOfMinersPerRoom = 4
                     break;
                 case 8:
                     targetExtensionCount = 60
@@ -188,18 +216,19 @@ module.exports.loop = function () {
                     noOfBuildersPerRoom = 15
                     noOfUpgradersPerRoom = 4
                     noOfMaintainersPerRoom = 0
+                    noOfMinersPerRoom = 4
                     break;
                 default:
                     break;
             }
 
-            var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 5)
+            var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 10)
             console.log('valid tiles #: ' +validTiles.length)
             var extensions = _.filter(Game.structures, (structure) => structure.structureType == 'extension'); /** TODO: Check if this is per room? Attention: Construction sites of type 'extension' != extensions!*/
             if (extensions.length < targetExtensionCount) {
                 console.log('• [' + roomName + '] Building extension: '+extensions.length+' of ['+targetExtensionCount+']')
-                for (let index = 0; index < targetExtensionCount; index++) {
-                    Game.rooms[roomName].createConstructionSite(validTiles[index][0], validTiles[index][1], 'extension', 'Ext' + index)    
+                for (let index = 0; index < targetExtensionCount;index++) {
+                    Game.rooms[roomName].createConstructionSite(validTiles[index][0], validTiles[index][1], 'extension', 'Ext' + index)
                 }
             } else {
                 console.log('• [' + roomName + '] No extensions to build')
@@ -256,22 +285,21 @@ module.exports.loop = function () {
             /** Tower 1 */
             if (controllerLevel >= 3) {
                 console.log('• [' + roomName + '] Building tower 1.')
-                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 5)
-                //console.log('validtiles: ' + validTiles[0][1])
+                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 6)
                 Game.rooms[roomName].createConstructionSite(validTiles[0][0], validTiles[0][1], 'tower', 'tower1')
             }
             
             /** Storage - Stores huge amounts of resources (one per room) */
             if (controllerLevel >= 4) {
                 console.log('• [' + roomName + '] Building storage.')
-                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 5)
+                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 6)
                 Game.rooms[roomName].createConstructionSite(validTiles[0][0], validTiles[0][1], 'storage', 'Storage')
             }
 
             /** Tower 1 */
             if (controllerLevel >= 5) {
                 console.log('• [' + roomName + '] Building tower 2.')
-                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos,5)
+                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos,6)
                 Game.rooms[roomName].createConstructionSite(validTiles[0][0], validTiles[0][1], 'tower', 'tower2')
             }
             
@@ -280,11 +308,12 @@ module.exports.loop = function () {
                 var mineralSites = utilRoom.findMinerals(roomName)
                 console.log('• [' + roomName + '] has ' + mineralSites.length + ' mineral sites present.' )
                 console.log('• [' + roomName + '] Building mineral extractor of type [' + mineralSites[0].mineralType + ']')
+                roomResourceType = mineralSites[0].mineralType
                 Game.rooms[roomName].createConstructionSite(mineralSites[0].pos.x, mineralSites[0].pos.y, 'extractor', 'Extractor'+mineralSites[0].mineralType)
             }
             
 
-            /** Labs - produces mineral compounds, buusts and unboosts creeps */
+            /** Labs - produces mineral compounds, boosts and unboosts creeps */
 
             /** Terminal - send resources from one room to another one */
 
@@ -356,6 +385,9 @@ module.exports.loop = function () {
         }
         if(creep.memory.role == 'maintainer') {
             roleMaintainer.run(creep);
+        }
+        if(creep.memory.role == 'miner') {
+            roleMiner.run(creep, roomResourceType);
         }
     }
 }
