@@ -307,7 +307,19 @@ module.exports.loop = function () {
             }
 
             /** Building Ramparts */
-            
+            if(controllerLevel >= 7) {
+                var structuresToProtect = utilRoom.getStructuresInArea(roomName, Game.spawns['Spawn1'].pos, 10)
+                for (let index = 0; index < structuresToProtect.length; index++) {
+                    const element = structuresToProtect[index];
+                    if (Game.rooms[roomName].lookAt(element.pos.x, element.pos.y).length <= 2) { // only do ONCE
+                        const err = Game.rooms[roomName].createConstructionSite(element.pos.x, element.pos.y, 'rampart')                        
+                        if (err != OK) {
+                            console.log('• [' + roomName + '] ERROR Building ramparts: ' + err + ' at ' + element.pos.x + ' / ' + element.pos.y)
+                        }
+                    }
+                }
+                console.log('• [' + roomName + '] Building ramparts.')
+            }
 
             /** Labs - produces mineral compounds, boosts and unboosts creeps */
 
@@ -315,9 +327,7 @@ module.exports.loop = function () {
 
             /** Links - Transfers energy from point to point in one room*/
 
-            
 
-            /** Walls / Ramparts */
         }
 
         /** if there are construction sites in the room, create builders. Dont if there aren't any */
@@ -335,7 +345,7 @@ module.exports.loop = function () {
             var currentEnergy = utilRoom.getEnergy(roomName)
             console.log('• Room ' + roomName + ' has ' + currentEnergy + ' energy available.');
             console.log('• Room ' + roomName + ' Construction work to do   : ' + utilRoom.hasConstructionSites(roomName))
-            console.log('• Room ' + roomName + ' # of structures around Spawn   : ' + utilRoom.getStructuresInArea(roomName, Game.spawns['Spawn1'].pos, 10).length)
+            //console.log('• Room ' + roomName + ' # of structures around Spawn   : ' + utilRoom.getStructuresInArea(roomName, Game.spawns['Spawn1'].pos, 10).length)
 
             console.log('-------------------------------------------------')
             infoTimestamp = Game.time
@@ -361,6 +371,7 @@ module.exports.loop = function () {
                 const element = structures[index];
                 if (element.hits < element.hitsMax) {
                     Game.notify('• Room ' + roomName + ' reapairing structure.');
+                    //console.log('• Room ' + roomName + ' Tower is reapairing structure.')
                     var towers = Game.rooms[roomName].find(
                         FIND_MY_STRUCTURES, {filter: {structureType: STRUCTURE_TOWER}});
                     towers.forEach(tower => tower.repair(element))
