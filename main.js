@@ -5,6 +5,7 @@ var roleMaintainer = require('role.maintainer');
 var roleMiner = require('role.miner');
 var utilRoom = require('util.room');
 var util = require('util');
+
 var spawnTickDelay = 50
 var structureCheckTickDelay = 50
 var infoTickDelay = 20
@@ -59,11 +60,11 @@ module.exports.loop = function () {
                 }
                 var newName = 'Harvester' + Game.time;
                 console.log('• Spawning new harvester: ' + newName);
-                Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
+                Game.spawns['Spawn1'].spawnCreep(bodySetup, newName, 
                     {memory: {role: 'harvester'}});
             }
         
-            if(upgraders.length < noOfUpgradersPerRoom && harvesters.length == noOfHarvestersPerRoom) {
+            if(upgraders.length < noOfUpgradersPerRoom && harvesters.length >= noOfHarvestersPerRoom/2) {
                 var bodySetup = []
                 if (currentEnergy >= 400) {
                     bodySetup = [WORK,WORK,CARRY,CARRY,MOVE,MOVE]
@@ -79,7 +80,7 @@ module.exports.loop = function () {
                     {memory: {role: 'upgrader'}});
             }
         
-            if(builders.length < noOfBuildersPerRoom && utilRoom.hasConstructionSites(roomName) == true && upgraders.length == noOfUpgradersPerRoom) {
+            if(builders.length < noOfBuildersPerRoom && utilRoom.hasConstructionSites(roomName) == true && harvesters.length >= noOfHarvestersPerRoom/2) {
                 var bodySetup = []
                 if (currentEnergy >= 400) {
                     bodySetup = [WORK,WORK,WORK,CARRY,MOVE]
@@ -111,7 +112,7 @@ module.exports.loop = function () {
                     {memory: {role: 'maintainer'}});
             }
 
-            if(miners.length < noOfMinersPerRoom && controllerLevel >= 4 ) {
+            if(miners.length < noOfMinersPerRoom && controllerLevel >= 4 && !utilRoom.hasConstructionSites(roomName)) { // Only spawn them when the extractor is finished (no construction sites are left)
                 var bodySetup = []
                 if (currentEnergy >= 400) {
                     bodySetup = [WORK,WORK,CARRY,CARRY,MOVE,MOVE]
@@ -140,7 +141,7 @@ module.exports.loop = function () {
         }
         var totalActiveCreeps = harvesters.length + upgraders.length + builders.length + maintainers.length
         console.log('• Total active creeps: ' + totalActiveCreeps)
-        console.log('• Harvesters: ' + harvesters.length + ' | Upgraders: ' + upgraders.length+ ' | Builders: ' + builders.length + ' | Maintainers: ' + maintainers.length);
+        console.log('• Harvesters: ' + harvesters.length + ' | Upgraders: ' + upgraders.length+ ' | Builders: ' + builders.length + ' | Maintainers: ' + maintainers.length + ' | Miners: ' + miners.length);
         console.log('-------------------------------------------------')
         spawnTimestamp = Game.time
     }
@@ -196,7 +197,7 @@ module.exports.loop = function () {
 
                     noOfHarvestersPerRoom = 15
                     noOfBuildersPerRoom = 10
-                    noOfUpgradersPerRoom = 10
+                    noOfUpgradersPerRoom = 20
                     noOfMaintainersPerRoom = 0
                     noOfMinersPerRoom = 4
                     break;
@@ -205,7 +206,7 @@ module.exports.loop = function () {
 
                     noOfHarvestersPerRoom = 15
                     noOfBuildersPerRoom = 10
-                    noOfUpgradersPerRoom = 10
+                    noOfUpgradersPerRoom = 30
                     noOfMaintainersPerRoom = 0
                     noOfMinersPerRoom = 4
                     break;
@@ -214,7 +215,7 @@ module.exports.loop = function () {
 
                     noOfHarvestersPerRoom = 15
                     noOfBuildersPerRoom = 15
-                    noOfUpgradersPerRoom = 4
+                    noOfUpgradersPerRoom = 5
                     noOfMaintainersPerRoom = 0
                     noOfMinersPerRoom = 4
                     break;
