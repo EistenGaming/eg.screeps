@@ -139,7 +139,7 @@ module.exports.loop = function () {
                 Game.spawns['Spawn1'].pos.y, 
                 {align: 'left', opacity: 0.8});
         }
-        var totalActiveCreeps = harvesters.length + upgraders.length + builders.length + maintainers.length
+        var totalActiveCreeps = harvesters.length + upgraders.length + builders.length + maintainers.length + miners.length
         console.log('• Total active creeps: ' + totalActiveCreeps)
         console.log('• Harvesters: ' + harvesters.length + ' | Upgraders: ' + upgraders.length+ ' | Builders: ' + builders.length + ' | Maintainers: ' + maintainers.length + ' | Miners: ' + miners.length);
         console.log('-------------------------------------------------')
@@ -340,6 +340,7 @@ module.exports.loop = function () {
             var currentEnergy = utilRoom.getEnergy(roomName)
             console.log('• Room ' + roomName + ' has ' + currentEnergy + ' energy available.');
             console.log('• Room ' + roomName + ' Construction work to do   : ' + utilRoom.hasConstructionSites(roomName))
+            console.log('• Room ' + roomName + ' # of structures around Spawn   : ' + utilRoom.getStructuresInArea(roomName, Game.spawns['Spawn1'].pos, 10).length)
 
             console.log('-------------------------------------------------')
             infoTimestamp = Game.time
