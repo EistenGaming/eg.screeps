@@ -283,9 +283,9 @@ module.exports.loop = function () {
             //     }                    
             // }
             
-            /** Tower 1 */
+            /** Towers 1 */
             if (controllerLevel >= 3) {
-                console.log('• [' + roomName + '] Building tower 1.')
+                console.log('• [' + roomName + '] Building tower.')
                 var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos, 6)
                 Game.rooms[roomName].createConstructionSite(validTiles[0][0], validTiles[0][1], 'tower', 'tower1')
             }
@@ -297,13 +297,6 @@ module.exports.loop = function () {
                 Game.rooms[roomName].createConstructionSite(validTiles[0][0], validTiles[0][1], 'storage', 'Storage')
             }
 
-            /** Tower 1 */
-            if (controllerLevel >= 5) {
-                console.log('• [' + roomName + '] Building tower 2.')
-                var validTiles = utilRoom.getValidTilesCloseTo(roomName, Game.spawns['Spawn1'].pos,6)
-                Game.rooms[roomName].createConstructionSite(validTiles[0][0], validTiles[0][1], 'tower', 'tower2')
-            }
-            
             /** Mineral Sites - Valid at controller level 6 or higher */
             if (controllerLevel >= 6) {
                 var mineralSites = utilRoom.findMinerals(roomName)
@@ -312,6 +305,8 @@ module.exports.loop = function () {
                 roomResourceType = mineralSites[0].mineralType
                 Game.rooms[roomName].createConstructionSite(mineralSites[0].pos.x, mineralSites[0].pos.y, 'extractor', 'Extractor'+mineralSites[0].mineralType)
             }
+
+            /** Building Ramparts */
             
 
             /** Labs - produces mineral compounds, boosts and unboosts creeps */
