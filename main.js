@@ -301,25 +301,30 @@ module.exports.loop = function () {
             if (controllerLevel >= 6) {
                 var mineralSites = utilRoom.findMinerals(roomName)
                 console.log('• [' + roomName + '] has ' + mineralSites.length + ' mineral sites present.' )
-                console.log('• [' + roomName + '] Building mineral extractor of type [' + mineralSites[0].mineralType + ']')
-                roomResourceType = mineralSites[0].mineralType
-                Game.rooms[roomName].createConstructionSite(mineralSites[0].pos.x, mineralSites[0].pos.y, 'extractor', 'Extractor'+mineralSites[0].mineralType)
+                if (mineralSites.length >= 1) {
+                    console.log('• [' + roomName + '] Building mineral extractor of type [' + mineralSites[0].mineralType + ']')
+                    roomResourceType = mineralSites[0].mineralType
+                    Game.rooms[roomName].createConstructionSite(mineralSites[0].pos.x, mineralSites[0].pos.y, 'extractor', 'Extractor'+mineralSites[0].mineralType)                    
+                }
             }
 
             /** Building Ramparts */
-            if(controllerLevel >= 7) {
-                var structuresToProtect = utilRoom.getStructuresInArea(roomName, Game.spawns['Spawn1'].pos, 10)
-                for (let index = 0; index < structuresToProtect.length; index++) {
-                    const element = structuresToProtect[index];
-                    if (Game.rooms[roomName].lookAt(element.pos.x, element.pos.y).length <= 2) { // only do ONCE
-                        const err = Game.rooms[roomName].createConstructionSite(element.pos.x, element.pos.y, 'rampart')                        
-                        if (err != OK) {
-                            console.log('• [' + roomName + '] ERROR Building ramparts: ' + err + ' at ' + element.pos.x + ' / ' + element.pos.y)
-                        }
-                    }
-                }
-                console.log('• [' + roomName + '] Building ramparts.')
-            }
+
+            /** TODO: Needs refactoring. The energy cost to build ramparts is very high and likely inefficient. Also, energizing towers uses up a lot of energy (1000 per tower)! */
+
+            // if(controllerLevel >= 7) {
+            //     var structuresToProtect = utilRoom.getStructuresInArea(roomName, Game.spawns['Spawn1'].pos, 10)
+            //     for (let index = 0; index < structuresToProtect.length; index++) {
+            //         const element = structuresToProtect[index];
+            //         if (Game.rooms[roomName].lookAt(element.pos.x, element.pos.y).length <= 2) { // only do ONCE
+            //             const err = Game.rooms[roomName].createConstructionSite(element.pos.x, element.pos.y, 'rampart')                        
+            //             if (err != OK) {
+            //                 console.log('• [' + roomName + '] ERROR Building ramparts: ' + err + ' at ' + element.pos.x + ' / ' + element.pos.y)
+            //             }
+            //         }
+            //     }
+            //     console.log('• [' + roomName + '] Building ramparts.')
+            //}
 
             /** Labs - produces mineral compounds, boosts and unboosts creeps */
 

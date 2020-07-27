@@ -15,6 +15,10 @@ var roleHarvester = {
                             structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0;
                     }
             });
+            targets = targets.sort(function(a,b){
+                return a.structureType.localeCompare(b.structureType)
+            })
+            // targets = targets.reverse()
             if(targets.length > 0) {
                 if(creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(targets[0], {visualizePathStyle: {stroke: '#ffffff'}});
