@@ -1,8 +1,12 @@
 # eg.screeps
 
-World domination in three easy steps:
+We've recently stumbled over SCREEP on Steam and got hooked. Learning programming and solving problems has never been more fun :)
 
-1) Learning the Screeps API
+This is the code base we'll use to learn, improve and eventually go for (SCREEPS) world domination.
+
+Our approach in three easy steps:
+
+1) Learn the Screeps API
 2) Write and incrementally improve the screep's AI
 3) Dominate world
 
