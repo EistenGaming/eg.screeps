@@ -59,7 +59,7 @@ var utilRoom = {
         var structures = Game.rooms[roomName].find(FIND_STRUCTURES)
         for (let index = 0; index < structures.length; index++) {
             const element = structures[index];
-            if (Math.abs(element.pos.x - position.x) < range && Math.abs(element.pos.y - position.y )) {
+            if (Math.abs(element.pos.x - position.x) <= range && Math.abs(element.pos.y - position.y) <= range) {
                 retVal.push(element)
             }
         }
